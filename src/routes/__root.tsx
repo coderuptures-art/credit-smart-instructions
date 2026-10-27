@@ -79,17 +79,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Sahai Setu — Hospital Admin Console" },
+      { title: "PITCHPULSE — Football Intelligence" },
       {
         name: "description",
         content:
-          "Standalone demo administration console for the fictional Sahai Setu hospital network.",
+          "PITCHPULSE turns synthetic football events into live intelligence, tactical insight, stories, and recaps.",
       },
-      { name: "author", content: "Sahai Setu" },
+      { name: "author", content: "PITCHPULSE" },
       { property: "og:title", content: "Sahai Setu — Hospital Admin Console" },
       {
         property: "og:description",
-        content: "Demo administration console for the fictional Sahai Setu hospital network.",
+        content: "Synthetic football intelligence, tactical visualisation, and story studio.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

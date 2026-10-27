@@ -458,10 +458,26 @@ function LiveScene({
 }
 
 function TacticalScene() {
+  const [pattern, setPattern] = useState("HIGH-PRESS SUCCESS");
+  const patterns = [
+    ["HIGH-PRESS SUCCESS", "EV-021 · EV-052", "3 recoveries in 90 seconds"],
+    ["MOMENTUM SHIFT", "EV-028 · EV-067", "City control after 43'"],
+    ["PLAYER IMPACT", "EV-001 · EV-028", "Haaland 2 goals · 4 shots"],
+  ];
+  const selected = patterns.find(([name]) => name === pattern) ?? patterns[0]!;
   return (
-    <div className="tactical-grid">
-      <Panel title="HEATMAP · FIRST HALF" className="heat-panel">
+    <div className="tactical-grid scene-console">
+      <Panel title="HEATMAP & PRESSURE ZONES · 1ST HALF · 0'–45'" className="heat-panel">
+        <div className="viewport-labels">
+          <span>MCI / ATTACKING HALF</span>
+          <span>TRACK: {selected[0]}</span>
+        </div>
         <MiniPitch heat />
+        <div className="heat-callout">
+          <b>◎ {selected[0]}</b>
+          <small>{selected[2]}</small>
+          <small>{selected[1]}</small>
+        </div>
         <div className="heat-legend">
           <span>LOW</span>
           <i />
@@ -469,9 +485,10 @@ function TacticalScene() {
           <i />
           <i />
           <span>HIGH</span>
+          <em>● MCI &nbsp; ● LIV &nbsp; — PASS &nbsp; ⌁ PRESSURE ZONE</em>
         </div>
       </Panel>
-      <Panel title="PASS NETWORK" className="network-panel">
+      <Panel title="PASSING NETWORK" className="network-panel">
         <div className="network">
           <svg viewBox="0 0 320 190" aria-label="Passing network diagram">
             <g stroke="currentColor" opacity=".55">
@@ -482,6 +499,7 @@ function TacticalScene() {
                 [180, 150, 260, 95],
                 [130, 42, 260, 95],
                 [40, 140, 260, 95],
+                [220, 70, 180, 150],
               ].map((line, i) => (
                 <line key={i} x1={line[0]} y1={line[1]} x2={line[2]} y2={line[3]} />
               ))}
@@ -506,40 +524,46 @@ function TacticalScene() {
           </svg>
         </div>
         <div className="player-rank">
-          #10 HAALAND <b>8.7</b>
-          <br />
-          #17 DE BRUYNE <b>8.4</b>
-          <br />
-          #16 RODRI <b>7.9</b>
+          <span>#10 HAALAND</span>
+          <b>8.7</b>
+          <span>#17 DE BRUYNE</span>
+          <b>8.4</b>
+          <span>#16 RODRI</span>
+          <b>7.9</b>
         </div>
       </Panel>
-      <Panel title="EXPERIMENTAL DEMO INDICATORS" className="metrics-panel">
+      <Panel title="TACTICAL METRICS" className="metrics-panel">
         <Stat label="PRESSURE INDEX" value="72 / 100" accent />
         <Stat label="MOMENTUM" value="+3.2" accent />
-        <Stat label="CONTROL VS CHAOS" value="68" />
+        <Stat label="CONTROL VS CHAOS" value="68 / 100" />
         <Stat label="FINAL-THIRD ENTRIES" value="24" />
+        <div className="metric-foot">
+          <span>TOTAL PASSES</span>
+          <b>482</b>
+          <span>COMPLETION RATE</span>
+          <b>87%</b>
+        </div>
       </Panel>
-      <Panel title="PATTERNS DETECTED" className="patterns-panel">
-        <div className="pattern">
+      <Panel title="PATTERNS DETECTED · SELECT TO INSPECT EVIDENCE" className="patterns-panel">
+        <div className="pattern-tabs">
+          {patterns.map(([name]) => (
+            <button
+              key={name}
+              className={pattern === name ? "selected" : ""}
+              onClick={() => setPattern(name ?? "")}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+        <div className="pattern-evidence">
           <span>◎</span>
           <div>
-            <b>High-press success</b>
-            <small>3 recoveries in 90 seconds</small>
+            <b>{selected[0]}</b>
+            <small>{selected[2]}</small>
+            <small className="pixel">EVIDENCE: {selected[1]}</small>
           </div>
-        </div>
-        <div className="pattern">
-          <span>◌</span>
-          <div>
-            <b>Momentum shift</b>
-            <small>City control after 43&apos;</small>
-          </div>
-        </div>
-        <div className="pattern">
-          <span>✳</span>
-          <div>
-            <b>Player impact</b>
-            <small>Haaland 2 goals · 4 shots</small>
-          </div>
+          <ChevronRight />
         </div>
         <Bars values={[32, 48, 38, 68, 55, 82, 62, 92, 74, 86]} />
       </Panel>
@@ -621,103 +645,156 @@ function StudioScene({
   );
 }
 function RecapScene() {
+  const moments = events.filter(
+    (e) => e.type === "Goal" || e.type === "Shot" || e.type === "Tackle",
+  );
   return (
-    <div className="recap-grid">
+    <div className="recap-grid scene-console">
       <Panel className="score-card">
-        <p className="eyebrow">FULL TIME · 90:00</p>
-        <h2>
-          MANCHESTER CITY <b>2 — 0</b> LIVERPOOL
-        </h2>
-        <div className="recap-hero">
-          <strong>
-            FULL
+        <div className="score-header">
+          <div>
+            <p className="eyebrow">MATCH RECAP · FULL TIME · 90:00</p>
+            <h2>
+              MANCHESTER CITY <b>2 — 0</b> LIVERPOOL
+            </h2>
+          </div>
+          <span className="full-time-mark">
+            FT
             <br />
-            TIME
-          </strong>
+            <small>90:00</small>
+          </span>
+        </div>
+        <div className="score-stats">
           <span>
-            MORE THAN A SCORE.
-            <br />
-            IT&apos;S THE WHOLE STORY.
+            POSSESSION <b>62%</b>
+            <i style={{ width: "62%" }} />
+          </span>
+          <span>
+            SHOTS <b>10 — 4</b>
+            <i style={{ width: "76%" }} />
+          </span>
+          <span>
+            ON TARGET <b>8 — 2</b>
+            <i style={{ width: "82%" }} />
+          </span>
+          <span>
+            CORNERS <b>4 — 1</b>
+            <i style={{ width: "54%" }} />
           </span>
         </div>
       </Panel>
-      <Panel title="KEY MOMENTS">
-        <div className="timeline">
-          {events
-            .filter((e) => e.type === "Goal" || e.type === "Shot")
-            .map((event) => (
-              <div className="timeline-row" key={event.id}>
-                <b>{event.minute}&apos;</b>
-                <span className="dot lime-bg" />
-                <div>
-                  <strong>
-                    {event.type} · {event.player}
-                  </strong>
-                  <small>{event.detail}</small>
-                </div>
+      <Panel title="KEY MOMENTS · MATCH TIMELINE">
+        <div className="timeline-rail">
+          {moments.map((event) => (
+            <div className="timeline-row" key={event.id}>
+              <b>{event.minute}&apos;</b>
+              <span className={`dot ${event.type === "Goal" ? "lime-bg" : "teal-bg"}`} />
+              <div>
+                <strong>
+                  {event.type} · {event.player}
+                </strong>
+                <small>{event.detail}</small>
               </div>
-            ))}
+            </div>
+          ))}
         </div>
       </Panel>
       <Panel title="STANDOUT PLAYER" className="standout">
         <div className="player-number">09</div>
         <div>
+          <p className="eyebrow">MCI · FORWARD</p>
           <h2>ERLING HAALAND</h2>
           <p className="lime big-number">9.2</p>
-          <small>MATCH RATING</small>
+          <small>MATCH RATING · 2 GOALS · 4 SHOTS</small>
         </div>
       </Panel>
-      <Panel title="FINAL THOUGHTS">
+      <Panel title="TACTICAL TAKEAWAYS" className="takeaway-panel">
+        <div className="mini-takeaway">
+          <MiniPitch heat />
+          <div>
+            <b>HIGH-PRESS SUCCESS</b>
+            <p>City&apos;s high press created fast recoveries and short, high-value possessions.</p>
+          </div>
+        </div>
+      </Panel>
+      <Panel title="PERSONALISED STORY · FAN MODE">
         <p className="body-copy">
           City&apos;s high press and quick transitions made the difference. Haaland&apos;s clinical
           finishing and De Bruyne&apos;s creativity proved decisive.
         </p>
+        <button className="primary-action">
+          READ FULL STORY <ChevronRight />
+        </button>
       </Panel>
     </div>
   );
 }
 function StackScene() {
   const tech = [
-    "GitHub",
-    "GitHub Copilot",
-    "Microsoft Foundry",
-    "Azure AI Translator",
-    "Azure SQL Database",
-    "Azure Static Web Apps",
-    "Microsoft Fabric",
-    "Azure for Students",
-  ];
+    ["GitHub", "Code · collaborate · ship", "FRONTEND DEMO"],
+    ["GitHub Copilot", "AI pair programmer", "FRONTEND DEMO"],
+    ["Microsoft Foundry", "AI models · storytelling", "PLANNED INTEGRATION"],
+    ["Azure AI Translator", "Multi-language support", "PLANNED INTEGRATION"],
+    ["Azure SQL Database", "Match history · data storage", "PLANNED INTEGRATION"],
+    ["Azure Static Web Apps", "Frontend hosting", "FRONTEND DEMO"],
+    ["Microsoft Fabric", "Analytics · data pipeline", "PLANNED INTEGRATION"],
+    ["Azure for Students", "$100 credits · eligible", "FRONTEND DEMO"],
+  ] as const;
+  const steps = [
+    ["INGEST", "Synthetic event stream"],
+    ["PROCESS", "Event processing"],
+    ["ANALYSE", "Tactical rules"],
+    ["GENERATE", "Grounded narrative"],
+    ["DELIVER", "Broadcast / recap"],
+  ] as const;
   return (
-    <div className="stack-grid">
-      <Panel title="PLANNED DATA FLOW" className="pipeline">
+    <div className="stack-grid scene-console">
+      <Panel title="PLANNED DATA FLOW · SYNTHETIC DEMO" className="pipeline">
         <div className="pipeline-line">
-          {[
-            "Synthetic Event Generator",
-            "Event Processing",
-            "Tactical Rules",
-            "Grounded Narrative",
-            "Overlay / Recap",
-          ].map((step, i) => (
-            <div key={step}>
+          {steps.map(([label, detail], i) => (
+            <div key={label}>
               <span>0{i + 1}</span>
-              <b>{step}</b>
+              <b>{label}</b>
+              <small>{detail}</small>
               {i < 4 && <ChevronRight />}
             </div>
           ))}
         </div>
-        <p className="system-note">FRONTEND DEMO · NO SERVICES CONNECTED</p>
+        <div className="flow-trace">
+          <span>EVENT FEED</span>
+          <i />
+          <span>RULES</span>
+          <i />
+          <span>STORY + OVERLAY + RECAP</span>
+        </div>
+        <p className="system-note">
+          FRONTEND PROTOTYPE · NO SERVICES CONNECTED · STATUS LABELS ARE HONEST
+        </p>
       </Panel>
-      <Panel title="TECHNOLOGY CARDS" className="tech-cards">
-        {tech.map((item) => (
+      <Panel title="THE POWER BEHIND THE GAME" className="principles">
+        <div className="principle-mark">▦</div>
+        <h3>BUILD SMARTER.</h3>
+        {[
+          "Evidence-based",
+          "Explainable",
+          "Multi-language",
+          "Audience-personalised",
+          "Broadcast-ready",
+        ].map((item) => (
+          <div className="principle" key={item}>
+            <span>✓</span>
+            {item}
+          </div>
+        ))}
+      </Panel>
+      <Panel title="MICROSOFT TECHNOLOGY STACK" className="tech-cards">
+        {tech.map(([item, detail, status]) => (
           <div className="tech-tile" key={item}>
             <span className="tech-icon">✦</span>
             <div>
               <b>{item}</b>
-              <small>
-                {item.includes("Azure") || item.includes("Fabric")
-                  ? "PLANNED INTEGRATION"
-                  : "FRONTEND DEMO"}
-              </small>
+              <small>{detail}</small>
+              <em>{status}</em>
             </div>
           </div>
         ))}

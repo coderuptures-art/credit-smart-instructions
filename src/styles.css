@@ -104,7 +104,7 @@ input:focus-visible {
   opacity: 0.9;
   background-image:
     linear-gradient(180deg, rgba(1, 36, 32, 0.18), rgba(1, 36, 32, 0.54)),
-    url('/images/pitchpulse-background.png');
+    url("/images/pitchpulse-background.png");
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -115,8 +115,16 @@ input:focus-visible {
   background-image:
     linear-gradient(rgba(137, 201, 201, 0.06) 1px, transparent 1px),
     linear-gradient(90deg, rgba(137, 201, 201, 0.06) 1px, transparent 1px),
-    repeating-linear-gradient(0deg, transparent 0 4px, rgba(245, 246, 250, 0.08) 5px, transparent 6px);
-  background-size: 24px 24px, 24px 24px, auto;
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 4px,
+      rgba(245, 246, 250, 0.08) 5px,
+      transparent 6px
+    );
+  background-size:
+    24px 24px,
+    24px 24px,
+    auto;
   mix-blend-mode: screen;
 }
 .rail {
@@ -313,10 +321,21 @@ input:focus-visible {
 .hud-panel {
   background: linear-gradient(140deg, rgba(11, 59, 53, 0.78), rgba(3, 44, 39, 0.92));
   border: 1px solid var(--line);
-  clip-path: polygon(0 10px, 10px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 14px 100%, 0 calc(100% - 14px));
+  clip-path: polygon(
+    0 10px,
+    10px 0,
+    calc(100% - 14px) 0,
+    100% 14px,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    14px 100%,
+    0 calc(100% - 14px)
+  );
   position: relative;
   padding: 20px;
-  box-shadow: inset 0 0 0 1px rgba(137, 201, 201, 0.08), 0 12px 36px rgba(0, 0, 0, 0.14);
+  box-shadow:
+    inset 0 0 0 1px rgba(137, 201, 201, 0.08),
+    0 12px 36px rgba(0, 0, 0, 0.14);
 }
 .hud-panel:before,
 .hud-panel:after {
@@ -481,7 +500,10 @@ input:focus-visible {
   color: var(--paper);
   padding: 9px 12px;
   text-transform: uppercase;
-  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
+  transition:
+    background 140ms ease,
+    color 140ms ease,
+    border-color 140ms ease;
 }
 .control-deck button svg {
   width: 14px;
@@ -565,8 +587,96 @@ input:focus-visible {
 }
 .tactical-grid {
   display: grid;
-  grid-template-columns: 1.35fr 1fr 0.8fr;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1.45fr) minmax(220px, 0.82fr) minmax(190px, 0.7fr);
+  grid-template-rows: auto auto;
+  gap: 14px;
+}
+.scene-console .hud-panel {
+  background: linear-gradient(135deg, rgba(2, 52, 47, 0.88), rgba(1, 28, 27, 0.94));
+}
+.viewport-labels,
+.heat-legend {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.viewport-labels {
+  color: var(--teal);
+  font: 8px var(--font-pixel);
+  margin: -4px 0 10px;
+}
+.heat-panel {
+  position: relative;
+}
+.heat-callout {
+  position: absolute;
+  top: 118px;
+  right: 34px;
+  display: grid;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--lime);
+  background: rgba(1, 36, 32, 0.9);
+  font: 9px var(--font-pixel);
+  color: var(--lime);
+}
+.heat-callout small {
+  color: var(--paper);
+  font: 12px var(--font-body);
+}
+.heat-legend em {
+  margin-left: auto;
+  color: var(--teal);
+  font: 8px var(--font-pixel);
+  font-style: normal;
+}
+.metric-foot {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  border-top: 1px solid rgba(137, 201, 201, 0.16);
+  margin-top: 16px;
+  padding-top: 12px;
+  color: var(--muted);
+  font: 10px var(--font-pixel);
+}
+.metric-foot b {
+  color: var(--lime);
+}
+.pattern-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pattern-tabs button {
+  font: 8px var(--font-pixel);
+  color: var(--muted);
+}
+.pattern-tabs button.selected {
+  color: var(--lime);
+  border-color: var(--lime);
+}
+.pattern-evidence {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+}
+.pattern-evidence > span {
+  color: var(--lime);
+  font-size: 26px;
+}
+.pattern-evidence > div {
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+.pattern-evidence small {
+  color: var(--muted);
+}
+.pattern-evidence svg {
+  color: var(--lime);
 }
 .heat-panel {
   grid-row: span 2;
@@ -692,8 +802,18 @@ select {
   gap: 18px;
 }
 .story-art {
-  min-height: 240px;
-  background: linear-gradient(140deg, #32714d, #89b862 50%, #114236);
+  min-height: 280px;
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      140deg,
+      rgba(50, 113, 77, 0.5),
+      rgba(137, 184, 98, 0.45) 50%,
+      rgba(17, 66, 54, 0.65)
+    ),
+    repeating-linear-gradient(90deg, transparent 0 18px, rgba(217, 253, 145, 0.14) 19px 20px),
+    linear-gradient(160deg, #32714d, #89b862 50%, #114236);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -768,6 +888,64 @@ select {
 .score-card {
   grid-column: span 2;
 }
+.score-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.score-header h2 {
+  margin-top: 12px;
+}
+.full-time-mark {
+  color: var(--lime);
+  font: 34px var(--font-display);
+  text-align: right;
+}
+.full-time-mark small {
+  color: var(--teal);
+  font: 8px var(--font-pixel);
+}
+.score-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  border-top: 1px solid rgba(137, 201, 201, 0.16);
+  margin-top: 18px;
+  padding-top: 14px;
+}
+.score-stats span {
+  display: grid;
+  gap: 6px;
+  color: var(--teal);
+  font: 8px var(--font-pixel);
+}
+.score-stats b {
+  color: var(--paper);
+  font: 14px var(--font-body);
+}
+.score-stats i {
+  display: block;
+  height: 6px;
+  background: linear-gradient(90deg, var(--lime), var(--teal));
+}
+.takeaway-panel {
+  grid-column: span 1;
+}
+.mini-takeaway {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: center;
+}
+.mini-takeaway .heat {
+  min-height: 130px;
+}
+.mini-takeaway p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
 .score-card h2 {
   font: 24px var(--font-display);
   display: flex;
@@ -837,8 +1015,61 @@ select {
 }
 .stack-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1.55fr) minmax(220px, 0.65fr);
+  gap: 14px;
+}
+.pipeline {
+  grid-column: span 2;
+}
+.flow-trace {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  color: var(--teal);
+  font: 8px var(--font-pixel);
+}
+.flow-trace i {
+  height: 1px;
+  flex: 1;
+  background: var(--lime);
+  opacity: 0.7;
+}
+.principles {
+  grid-column: 2;
+  grid-row: 2;
+}
+.principle-mark {
+  color: var(--lime);
+  font-size: 38px;
+}
+.principles h3 {
+  color: var(--lime);
+  font: 28px var(--font-display);
+  margin: 10px 0 22px;
+}
+.principle {
+  display: flex;
+  gap: 10px;
+  padding: 9px 0;
+  border-top: 1px solid rgba(137, 201, 201, 0.16);
+  color: var(--paper);
+}
+.principle span {
+  color: var(--lime);
+}
+.tech-cards {
+  grid-column: 1;
+  grid-row: 2;
+}
+.tech-tile em {
+  display: inline-block;
+  color: var(--pitch);
+  background: var(--lime);
+  padding: 4px 6px;
+  font: 7px var(--font-pixel);
+  font-style: normal;
+  margin-top: 6px;
 }
 .pipeline-line {
   display: flex;
@@ -1048,9 +1279,20 @@ select {
   .tactical-grid,
   .studio-grid,
   .stack-grid,
-  .explorer-grid,
-  .preferences-grid {
-    grid-template-columns: 1fr 1fr;
+  .recap-grid,
+  .recap-studio-grid {
+    grid-template-columns: 1fr;
+  }
+  .pipeline,
+  .principles,
+  .tech-cards,
+  .score-card,
+  .takeaway-panel {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .score-stats {
+    grid-template-columns: repeat(2, 1fr);
   }
   .right-stack,
   .patterns-panel {

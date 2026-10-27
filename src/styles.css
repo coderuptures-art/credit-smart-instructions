@@ -88,8 +88,33 @@ input:focus-visible {
 }
 .app-shell {
   min-height: 100vh;
+  position: relative;
+  isolation: isolate;
   background:
-    radial-gradient(circle at 70% 0%, rgba(137, 201, 201, 0.08), transparent 35%), var(--pitch);
+    radial-gradient(circle at 72% 0%, rgba(137, 201, 201, 0.1), transparent 34%),
+    radial-gradient(circle at 14% 90%, rgba(217, 253, 145, 0.07), transparent 25%),
+    var(--pitch);
+}
+.app-shell::before,
+.app-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+.app-shell::before {
+  opacity: 0.28;
+  background-image:
+    linear-gradient(rgba(137, 201, 201, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(137, 201, 201, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+.app-shell::after {
+  opacity: 0.16;
+  background: repeating-linear-gradient(0deg, transparent 0 4px, rgba(245, 246, 250, 0.08) 5px, transparent 6px);
+  mix-blend-mode: screen;
 }
 .rail {
   position: fixed;
@@ -283,11 +308,12 @@ input:focus-visible {
   margin-left: 8px;
 }
 .hud-panel {
-  background: linear-gradient(140deg, rgba(11, 59, 53, 0.75), rgba(3, 44, 39, 0.88));
+  background: linear-gradient(140deg, rgba(11, 59, 53, 0.78), rgba(3, 44, 39, 0.92));
   border: 1px solid var(--line);
+  clip-path: polygon(0 10px, 10px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 14px 100%, 0 calc(100% - 14px));
   position: relative;
   padding: 20px;
-  box-shadow: inset 0 0 0 1px rgba(137, 201, 201, 0.05);
+  box-shadow: inset 0 0 0 1px rgba(137, 201, 201, 0.08), 0 12px 36px rgba(0, 0, 0, 0.14);
 }
 .hud-panel:before,
 .hud-panel:after {
@@ -448,9 +474,11 @@ input:focus-visible {
 .primary-action,
 .segmented button {
   border: 1px solid var(--line);
-  background: transparent;
+  background: rgba(1, 36, 32, 0.72);
   color: var(--paper);
   padding: 9px 12px;
+  text-transform: uppercase;
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
 }
 .control-deck button svg {
   width: 14px;
@@ -992,6 +1020,16 @@ select {
 .close-menu,
 .mobile-nav {
   display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 @media (max-width: 1100px) {
   .rail {

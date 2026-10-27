@@ -4,16 +4,18 @@ export type Lang = "en" | "hi" | "ta";
 
 const en: Record<string, string> = {
   "gate.title": "Hospital Admin Panel",
-  "gate.subtitle": "Access the hospital management dashboard and monitor operations across all locations.",
+  "gate.subtitle":
+    "Access the hospital management dashboard and monitor operations across all locations.",
   "gate.password": "Enter admin password",
   "gate.unlock": "Access Admin Panel",
   "gate.error": "Incorrect password. Please try again.",
   "gate.show": "Show password",
   "gate.hide": "Hide password",
   "gate.back": "Back to Sahai Setu",
-  "gate.note": "Demo environment — this console uses fictional data only and is not connected to any real hospital.",
+  "gate.note":
+    "Demo environment — this console uses fictional data only and is not connected to any real hospital.",
   "gate.security": "This password is a visual demo gate, not real authentication.",
-  "tagline": "Care. Connect. Heal.",
+  tagline: "Care. Connect. Heal.",
   "nav.overview": "Overview",
   "nav.hospitals": "Hospitals",
   "nav.doctors": "Doctors & Staff",
@@ -93,9 +95,10 @@ const hi: Record<string, string> = {
   "gate.show": "पासवर्ड दिखाएँ",
   "gate.hide": "पासवर्ड छिपाएँ",
   "gate.back": "सहाई सेतु पर वापस",
-  "gate.note": "डेमो वातावरण — इस कंसोल में केवल काल्पनिक डेटा है और यह किसी वास्तविक अस्पताल से नहीं जुड़ा है।",
+  "gate.note":
+    "डेमो वातावरण — इस कंसोल में केवल काल्पनिक डेटा है और यह किसी वास्तविक अस्पताल से नहीं जुड़ा है।",
   "gate.security": "यह पासवर्ड केवल डेमो गेट है, वास्तविक प्रमाणीकरण नहीं।",
-  "tagline": "देखभाल। जुड़ाव। उपचार।",
+  tagline: "देखभाल। जुड़ाव। उपचार।",
   "nav.overview": "अवलोकन",
   "nav.hospitals": "अस्पताल",
   "nav.doctors": "डॉक्टर और स्टाफ",
@@ -168,16 +171,18 @@ const hi: Record<string, string> = {
 
 const ta: Record<string, string> = {
   "gate.title": "மருத்துவமனை நிர்வாக பேனல்",
-  "gate.subtitle": "அனைத்து இடங்களின் செயல்பாடுகளைக் கண்காணிக்க மருத்துவமனை நிர்வாக டாஷ்போர்டை அணுகவும்.",
+  "gate.subtitle":
+    "அனைத்து இடங்களின் செயல்பாடுகளைக் கண்காணிக்க மருத்துவமனை நிர்வாக டாஷ்போர்டை அணுகவும்.",
   "gate.password": "நிர்வாக கடவுச்சொல்லை உள்ளிடவும்",
   "gate.unlock": "நிர்வாக பேனலைத் திறக்கவும்",
   "gate.error": "தவறான கடவுச்சொல். மீண்டும் முயற்சிக்கவும்.",
   "gate.show": "கடவுச்சொல்லைக் காட்டு",
   "gate.hide": "கடவுச்சொல்லை மறை",
   "gate.back": "சஹாய் சேதுவுக்குத் திரும்ப",
-  "gate.note": "டெமோ சூழல் — இந்த கன்சோலில் கற்பனையான தரவு மட்டுமே உள்ளது; இது எந்த உண்மையான மருத்துவமனையுடனும் இணைக்கப்படவில்லை.",
+  "gate.note":
+    "டெமோ சூழல் — இந்த கன்சோலில் கற்பனையான தரவு மட்டுமே உள்ளது; இது எந்த உண்மையான மருத்துவமனையுடனும் இணைக்கப்படவில்லை.",
   "gate.security": "இந்த கடவுச்சொல் டெமோ கேட் மட்டுமே, உண்மையான அங்கீகாரம் அல்ல.",
-  "tagline": "கவனிப்பு. இணைப்பு. குணம்.",
+  tagline: "கவனிப்பு. இணைப்பு. குணம்.",
   "nav.overview": "மேலோட்டம்",
   "nav.hospitals": "மருத்துவமனைகள்",
   "nav.doctors": "மருத்துவர்கள் & ஊழியர்கள்",
@@ -281,7 +286,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const t = (key: string) => translations[lang][key] ?? en[key] ?? key;
 
-  return <LanguageContext.Provider value={{ lang, setLang, t }}>{children}</LanguageContext.Provider>;
+  return (
+    <LanguageContext.Provider value={{ lang, setLang, t }}>{children}</LanguageContext.Provider>
+  );
 }
 
 export function useI18n() {

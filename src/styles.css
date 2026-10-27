@@ -90,10 +90,7 @@ input:focus-visible {
   min-height: 100vh;
   position: relative;
   isolation: isolate;
-  background:
-    radial-gradient(circle at 72% 0%, rgba(137, 201, 201, 0.1), transparent 34%),
-    radial-gradient(circle at 14% 90%, rgba(217, 253, 145, 0.07), transparent 25%),
-    var(--pitch);
+  background: var(--pitch);
 }
 .app-shell::before,
 .app-shell::after {
@@ -104,16 +101,22 @@ input:focus-visible {
   z-index: -1;
 }
 .app-shell::before {
-  opacity: 0.28;
+  opacity: 0.9;
   background-image:
-    linear-gradient(rgba(137, 201, 201, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(137, 201, 201, 0.08) 1px, transparent 1px);
-  background-size: 24px 24px;
-  mask-image: linear-gradient(to bottom, black, transparent 88%);
+    linear-gradient(180deg, rgba(1, 36, 32, 0.18), rgba(1, 36, 32, 0.54)),
+    url('/images/pitchpulse-background.png');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 .app-shell::after {
-  opacity: 0.16;
-  background: repeating-linear-gradient(0deg, transparent 0 4px, rgba(245, 246, 250, 0.08) 5px, transparent 6px);
+  opacity: 0.2;
+  background-image:
+    linear-gradient(rgba(137, 201, 201, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(137, 201, 201, 0.06) 1px, transparent 1px),
+    repeating-linear-gradient(0deg, transparent 0 4px, rgba(245, 246, 250, 0.08) 5px, transparent 6px);
+  background-size: 24px 24px, 24px 24px, auto;
   mix-blend-mode: screen;
 }
 .rail {
@@ -1071,6 +1074,13 @@ select {
   }
 }
 @media (max-width: 700px) {
+  .app-shell::before {
+    background-position: center top;
+    background-attachment: scroll;
+  }
+  .app-shell::after {
+    opacity: 0.14;
+  }
   .rail {
     transform: translateX(-100%);
     transition: transform 0.2s;

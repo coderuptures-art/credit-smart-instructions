@@ -451,6 +451,20 @@ function LiveScene({
             High press success is creating fast transitions. <b>{stats.recoveries} recoveries</b>{" "}
             recorded in the attacking half.
           </p>
+          <div className="evidence-line">
+            <span>EV-021 · EV-052</span>
+            <b>VERIFIED SYNTHETIC DATA</b>
+          </div>
+        </Panel>
+        <Panel title="PLAYER FOCUS · TRACKING LOCK">
+          <div className="focus-player">
+            <span className="player-number">09</span>
+            <div>
+              <b>ERLING HAALAND</b>
+              <small>2 GOALS · 4 SHOTS · 8.7 RATING</small>
+            </div>
+            <ChevronRight />
+          </div>
         </Panel>
       </div>
     </div>
@@ -458,10 +472,26 @@ function LiveScene({
 }
 
 function TacticalScene() {
+  const [pattern, setPattern] = useState("HIGH-PRESS SUCCESS");
+  const patterns = [
+    ["HIGH-PRESS SUCCESS", "EV-021 · EV-052", "3 recoveries in 90 seconds"],
+    ["MOMENTUM SHIFT", "EV-028 · EV-067", "City control after 43'"],
+    ["PLAYER IMPACT", "EV-001 · EV-028", "Haaland 2 goals · 4 shots"],
+  ];
+  const selected = patterns.find(([name]) => name === pattern) ?? patterns[0]!;
   return (
-    <div className="tactical-grid">
-      <Panel title="HEATMAP · FIRST HALF" className="heat-panel">
+    <div className="tactical-grid scene-console">
+      <Panel title="HEATMAP & PRESSURE ZONES · 1ST HALF · 0'–45'" className="heat-panel">
+        <div className="viewport-labels">
+          <span>MCI / ATTACKING HALF</span>
+          <span>TRACK: {selected[0]}</span>
+        </div>
         <MiniPitch heat />
+        <div className="heat-callout">
+          <b>◎ {selected[0]}</b>
+          <small>{selected[2]}</small>
+          <small>{selected[1]}</small>
+        </div>
         <div className="heat-legend">
           <span>LOW</span>
           <i />
@@ -469,9 +499,10 @@ function TacticalScene() {
           <i />
           <i />
           <span>HIGH</span>
+          <em>● MCI &nbsp; ● LIV &nbsp; — PASS &nbsp; ⌁ PRESSURE ZONE</em>
         </div>
       </Panel>
-      <Panel title="PASS NETWORK" className="network-panel">
+      <Panel title="PASSING NETWORK" className="network-panel">
         <div className="network">
           <svg viewBox="0 0 320 190" aria-label="Passing network diagram">
             <g stroke="currentColor" opacity=".55">
@@ -482,6 +513,7 @@ function TacticalScene() {
                 [180, 150, 260, 95],
                 [130, 42, 260, 95],
                 [40, 140, 260, 95],
+                [220, 70, 180, 150],
               ].map((line, i) => (
                 <line key={i} x1={line[0]} y1={line[1]} x2={line[2]} y2={line[3]} />
               ))}
@@ -506,40 +538,46 @@ function TacticalScene() {
           </svg>
         </div>
         <div className="player-rank">
-          #10 HAALAND <b>8.7</b>
-          <br />
-          #17 DE BRUYNE <b>8.4</b>
-          <br />
-          #16 RODRI <b>7.9</b>
+          <span>#10 HAALAND</span>
+          <b>8.7</b>
+          <span>#17 DE BRUYNE</span>
+          <b>8.4</b>
+          <span>#16 RODRI</span>
+          <b>7.9</b>
         </div>
       </Panel>
-      <Panel title="EXPERIMENTAL DEMO INDICATORS" className="metrics-panel">
+      <Panel title="TACTICAL METRICS" className="metrics-panel">
         <Stat label="PRESSURE INDEX" value="72 / 100" accent />
         <Stat label="MOMENTUM" value="+3.2" accent />
-        <Stat label="CONTROL VS CHAOS" value="68" />
+        <Stat label="CONTROL VS CHAOS" value="68 / 100" />
         <Stat label="FINAL-THIRD ENTRIES" value="24" />
+        <div className="metric-foot">
+          <span>TOTAL PASSES</span>
+          <b>482</b>
+          <span>COMPLETION RATE</span>
+          <b>87%</b>
+        </div>
       </Panel>
-      <Panel title="PATTERNS DETECTED" className="patterns-panel">
-        <div className="pattern">
+      <Panel title="PATTERNS DETECTED · SELECT TO INSPECT EVIDENCE" className="patterns-panel">
+        <div className="pattern-tabs">
+          {patterns.map(([name]) => (
+            <button
+              key={name}
+              className={pattern === name ? "selected" : ""}
+              onClick={() => setPattern(name ?? "")}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+        <div className="pattern-evidence">
           <span>◎</span>
           <div>
-            <b>High-press success</b>
-            <small>3 recoveries in 90 seconds</small>
+            <b>{selected[0]}</b>
+            <small>{selected[2]}</small>
+            <small className="pixel">EVIDENCE: {selected[1]}</small>
           </div>
-        </div>
-        <div className="pattern">
-          <span>◌</span>
-          <div>
-            <b>Momentum shift</b>
-            <small>City control after 43&apos;</small>
-          </div>
-        </div>
-        <div className="pattern">
-          <span>✳</span>
-          <div>
-            <b>Player impact</b>
-            <small>Haaland 2 goals · 4 shots</small>
-          </div>
+          <ChevronRight />
         </div>
         <Bars values={[32, 48, 38, 68, 55, 82, 62, 92, 74, 86]} />
       </Panel>
@@ -621,103 +659,156 @@ function StudioScene({
   );
 }
 function RecapScene() {
+  const moments = events.filter(
+    (e) => e.type === "Goal" || e.type === "Shot" || e.type === "Tackle",
+  );
   return (
-    <div className="recap-grid">
+    <div className="recap-grid scene-console">
       <Panel className="score-card">
-        <p className="eyebrow">FULL TIME · 90:00</p>
-        <h2>
-          MANCHESTER CITY <b>2 — 0</b> LIVERPOOL
-        </h2>
-        <div className="recap-hero">
-          <strong>
-            FULL
+        <div className="score-header">
+          <div>
+            <p className="eyebrow">MATCH RECAP · FULL TIME · 90:00</p>
+            <h2>
+              MANCHESTER CITY <b>2 — 0</b> LIVERPOOL
+            </h2>
+          </div>
+          <span className="full-time-mark">
+            FT
             <br />
-            TIME
-          </strong>
+            <small>90:00</small>
+          </span>
+        </div>
+        <div className="score-stats">
           <span>
-            MORE THAN A SCORE.
-            <br />
-            IT&apos;S THE WHOLE STORY.
+            POSSESSION <b>62%</b>
+            <i style={{ width: "62%" }} />
+          </span>
+          <span>
+            SHOTS <b>10 — 4</b>
+            <i style={{ width: "76%" }} />
+          </span>
+          <span>
+            ON TARGET <b>8 — 2</b>
+            <i style={{ width: "82%" }} />
+          </span>
+          <span>
+            CORNERS <b>4 — 1</b>
+            <i style={{ width: "54%" }} />
           </span>
         </div>
       </Panel>
-      <Panel title="KEY MOMENTS">
-        <div className="timeline">
-          {events
-            .filter((e) => e.type === "Goal" || e.type === "Shot")
-            .map((event) => (
-              <div className="timeline-row" key={event.id}>
-                <b>{event.minute}&apos;</b>
-                <span className="dot lime-bg" />
-                <div>
-                  <strong>
-                    {event.type} · {event.player}
-                  </strong>
-                  <small>{event.detail}</small>
-                </div>
+      <Panel title="KEY MOMENTS · MATCH TIMELINE">
+        <div className="timeline-rail">
+          {moments.map((event) => (
+            <div className="timeline-row" key={event.id}>
+              <b>{event.minute}&apos;</b>
+              <span className={`dot ${event.type === "Goal" ? "lime-bg" : "teal-bg"}`} />
+              <div>
+                <strong>
+                  {event.type} · {event.player}
+                </strong>
+                <small>{event.detail}</small>
               </div>
-            ))}
+            </div>
+          ))}
         </div>
       </Panel>
       <Panel title="STANDOUT PLAYER" className="standout">
         <div className="player-number">09</div>
         <div>
+          <p className="eyebrow">MCI · FORWARD</p>
           <h2>ERLING HAALAND</h2>
           <p className="lime big-number">9.2</p>
-          <small>MATCH RATING</small>
+          <small>MATCH RATING · 2 GOALS · 4 SHOTS</small>
         </div>
       </Panel>
-      <Panel title="FINAL THOUGHTS">
+      <Panel title="TACTICAL TAKEAWAYS" className="takeaway-panel">
+        <div className="mini-takeaway">
+          <MiniPitch heat />
+          <div>
+            <b>HIGH-PRESS SUCCESS</b>
+            <p>City&apos;s high press created fast recoveries and short, high-value possessions.</p>
+          </div>
+        </div>
+      </Panel>
+      <Panel title="PERSONALISED STORY · FAN MODE">
         <p className="body-copy">
           City&apos;s high press and quick transitions made the difference. Haaland&apos;s clinical
           finishing and De Bruyne&apos;s creativity proved decisive.
         </p>
+        <button className="primary-action">
+          READ FULL STORY <ChevronRight />
+        </button>
       </Panel>
     </div>
   );
 }
 function StackScene() {
   const tech = [
-    "GitHub",
-    "GitHub Copilot",
-    "Microsoft Foundry",
-    "Azure AI Translator",
-    "Azure SQL Database",
-    "Azure Static Web Apps",
-    "Microsoft Fabric",
-    "Azure for Students",
-  ];
+    ["GitHub", "Code · collaborate · ship", "FRONTEND DEMO"],
+    ["GitHub Copilot", "AI pair programmer", "FRONTEND DEMO"],
+    ["Microsoft Foundry", "AI models · storytelling", "PLANNED INTEGRATION"],
+    ["Azure AI Translator", "Multi-language support", "PLANNED INTEGRATION"],
+    ["Azure SQL Database", "Match history · data storage", "PLANNED INTEGRATION"],
+    ["Azure Static Web Apps", "Frontend hosting", "FRONTEND DEMO"],
+    ["Microsoft Fabric", "Analytics · data pipeline", "PLANNED INTEGRATION"],
+    ["Azure for Students", "$100 credits · eligible", "FRONTEND DEMO"],
+  ] as const;
+  const steps = [
+    ["INGEST", "Synthetic event stream"],
+    ["PROCESS", "Event processing"],
+    ["ANALYSE", "Tactical rules"],
+    ["GENERATE", "Grounded narrative"],
+    ["DELIVER", "Broadcast / recap"],
+  ] as const;
   return (
-    <div className="stack-grid">
-      <Panel title="PLANNED DATA FLOW" className="pipeline">
+    <div className="stack-grid scene-console">
+      <Panel title="PLANNED DATA FLOW · SYNTHETIC DEMO" className="pipeline">
         <div className="pipeline-line">
-          {[
-            "Synthetic Event Generator",
-            "Event Processing",
-            "Tactical Rules",
-            "Grounded Narrative",
-            "Overlay / Recap",
-          ].map((step, i) => (
-            <div key={step}>
+          {steps.map(([label, detail], i) => (
+            <div key={label}>
               <span>0{i + 1}</span>
-              <b>{step}</b>
+              <b>{label}</b>
+              <small>{detail}</small>
               {i < 4 && <ChevronRight />}
             </div>
           ))}
         </div>
-        <p className="system-note">FRONTEND DEMO · NO SERVICES CONNECTED</p>
+        <div className="flow-trace">
+          <span>EVENT FEED</span>
+          <i />
+          <span>RULES</span>
+          <i />
+          <span>STORY + OVERLAY + RECAP</span>
+        </div>
+        <p className="system-note">
+          FRONTEND PROTOTYPE · NO SERVICES CONNECTED · STATUS LABELS ARE HONEST
+        </p>
       </Panel>
-      <Panel title="TECHNOLOGY CARDS" className="tech-cards">
-        {tech.map((item) => (
+      <Panel title="THE POWER BEHIND THE GAME" className="principles">
+        <div className="principle-mark">▦</div>
+        <h3>BUILD SMARTER.</h3>
+        {[
+          "Evidence-based",
+          "Explainable",
+          "Multi-language",
+          "Audience-personalised",
+          "Broadcast-ready",
+        ].map((item) => (
+          <div className="principle" key={item}>
+            <span>✓</span>
+            {item}
+          </div>
+        ))}
+      </Panel>
+      <Panel title="MICROSOFT TECHNOLOGY STACK" className="tech-cards">
+        {tech.map(([item, detail, status]) => (
           <div className="tech-tile" key={item}>
             <span className="tech-icon">✦</span>
             <div>
               <b>{item}</b>
-              <small>
-                {item.includes("Azure") || item.includes("Fabric")
-                  ? "PLANNED INTEGRATION"
-                  : "FRONTEND DEMO"}
-              </small>
+              <small>{detail}</small>
+              <em>{status}</em>
             </div>
           </div>
         ))}
@@ -735,52 +826,167 @@ function ExplorerScene({
   setClock: (v: number) => void;
 }) {
   const [filter, setFilter] = useState<EventType | "All">("All");
-  const filtered = events.filter((event) => filter === "All" || event.type === filter);
+  const [team, setTeam] = useState("All teams");
+  const filtered = events.filter(
+    (event) =>
+      (filter === "All" || event.type === filter) && (team === "All teams" || event.team === team),
+  );
+  const select = (event: (typeof events)[number]) => {
+    setSelectedEvent(event);
+    setClock(event.minute);
+  };
   return (
-    <div className="explorer-grid">
-      <Panel title="EVENT FILTERS" className="filter-panel">
-        <select value={filter} onChange={(e) => setFilter(e.target.value as EventType | "All")}>
-          <option>All</option>
-          {["Goal", "Shot", "Pass", "Tackle", "Recovery", "Pressure", "Corner"].map((type) => (
-            <option key={type}>{type}</option>
-          ))}
-        </select>
+    <div className="explorer-grid scene-console">
+      <Panel title="FILTERS · EVENT INDEX" className="filter-panel">
+        <label>
+          TEAM
+          <select value={team} onChange={(e) => setTeam(e.target.value)}>
+            <option>All teams</option>
+            <option>MCI</option>
+            <option>LIV</option>
+          </select>
+        </label>
+        <label>
+          EVENT TYPE
+          <select value={filter} onChange={(e) => setFilter(e.target.value as EventType | "All")}>
+            <option>All</option>
+            {["Goal", "Shot", "Pass", "Tackle", "Recovery", "Pressure", "Corner"].map((type) => (
+              <option key={type}>{type}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          PLAYER
+          <select>
+            <option>All players</option>
+            <option>Erling Haaland</option>
+            <option>Rodri</option>
+            <option>Kevin De Bruyne</option>
+          </select>
+        </label>
+        <label>
+          MINUTE RANGE
+          <input type="range" min="0" max="90" defaultValue="67" />
+        </label>
+        <div className="button-row">
+          <button
+            className="primary-action"
+            onClick={() => {
+              setFilter("All");
+              setTeam("All teams");
+            }}
+          >
+            APPLY FILTERS
+          </button>
+          <button
+            onClick={() => {
+              setFilter("All");
+              setTeam("All teams");
+            }}
+          >
+            RESET
+          </button>
+        </div>
         <p className="pixel">{filtered.length} EVENTS INDEXED</p>
         <MiniPitch selected={selectedEvent.minute} />
-      </Panel>
-      <Panel title="EVENT LOG · SELECT ROW TO REPLAY" className="table-panel">
-        <div className="event-table" role="region" aria-label="Synthetic event log" tabIndex={0}>
-          <table>
-            <caption className="sr-only">Synthetic match event log</caption>
-            <thead>
-              <tr>
-                <th>TIME</th>
-                <th>TYPE</th>
-                <th>PLAYER</th>
-                <th>DETAIL</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((event) => (
-                <tr
-                  key={event.id}
-                  className={selectedEvent.id === event.id ? "selected" : ""}
-                  onClick={() => {
-                    setSelectedEvent(event);
-                    setClock(event.minute);
-                  }}
-                >
-                  <td>{event.minute}&apos;</td>
-                  <td>{event.type}</td>
-                  <td>{event.player}</td>
-                  <td>{event.detail}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="event-counts">
+          {["Pass", "Shot", "Tackle", "Foul", "Recovery", "Goal"].map((type) => (
+            <span key={type}>
+              {type}
+              <b>{events.filter((e) => e.type === type).length}</b>
+            </span>
+          ))}
         </div>
-        <pre className="json-view">{JSON.stringify(selectedEvent, null, 2)}</pre>
       </Panel>
+      <div className="explorer-center">
+        <Panel title="EVENT POSITION · SELECTED MARKER">
+          <MiniPitch selected={selectedEvent.minute} />
+          <div className="pitch-legend">
+            <span>● MCI</span>
+            <span>● LIV</span>
+            <span>◎ SELECTED EVENT</span>
+          </div>
+        </Panel>
+        <Panel title={`EVENT DETAILS · ${selectedEvent.id}`} className="event-detail">
+          <div className="detail-frame">
+            <MiniPitch selected={selectedEvent.minute} />
+            <span className="detail-play">▶</span>
+          </div>
+          <div>
+            <p className="eyebrow">
+              {selectedEvent.type} · {formatClock(selectedEvent.minute)}
+            </p>
+            <h3>{selectedEvent.player}</h3>
+            <p className="body-copy">{selectedEvent.detail}</p>
+            <small>
+              {selectedEvent.team} · x {selectedEvent.x} · y {selectedEvent.y} · synthetic event
+            </small>
+          </div>
+        </Panel>
+        <Panel title="EVENT TIMELINE · REPLAY">
+          <input
+            className="timeline-input"
+            type="range"
+            min="0"
+            max="90"
+            value={selectedEvent.minute}
+            onChange={(e) => setClock(Number(e.target.value))}
+          />
+          <div className="timeline-markers">
+            {events.map((event) => (
+              <button
+                key={event.id}
+                style={{ left: `${event.minute}%` }}
+                onClick={() => select(event)}
+                title={`${event.minute}' ${event.type}`}
+              />
+            ))}
+          </div>
+          <div className="control-deck">
+            <button onClick={() => setClock(Math.max(0, selectedEvent.minute - 1))}>
+              <RotateCcw />
+            </button>
+            <button onClick={() => setClock(selectedEvent.minute + 1)}>
+              <Play />
+            </button>
+            <span className="pixel">{formatClock(selectedEvent.minute)} · 1× 2× 4×</span>
+          </div>
+        </Panel>
+      </div>
+      <div className="explorer-right">
+        <Panel title="EVENT LOG · SELECT ROW TO REPLAY">
+          <div className="event-table">
+            <table>
+              <caption className="sr-only">Synthetic event log</caption>
+              <thead>
+                <tr>
+                  <th>TIME</th>
+                  <th>TYPE</th>
+                  <th>PLAYER</th>
+                  <th>TEAM</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((event) => (
+                  <tr
+                    key={event.id}
+                    className={selectedEvent.id === event.id ? "selected" : ""}
+                    onClick={() => select(event)}
+                  >
+                    <td>{event.minute}&apos;</td>
+                    <td>{event.type}</td>
+                    <td>{event.player.replace("Erling ", "")}</td>
+                    <td>{event.team}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Panel>
+        <Panel title="EVENT PAYLOAD · JSON">
+          <pre className="json-view">{JSON.stringify(selectedEvent, null, 2)}</pre>
+        </Panel>
+      </div>
     </div>
   );
 }
@@ -796,18 +1002,31 @@ function PreferencesScene({
   setLanguage: (v: "English" | "Hindi" | "Tamil") => void;
 }) {
   const [club, setClub] = useState("Manchester City");
+  const [player, setPlayer] = useState("Erling Haaland #9");
   const [focus, setFocus] = useState("Match story");
+  const story = STORIES[mode][language];
+  const languagePreview =
+    language === "English"
+      ? "Haaland strikes again!"
+      : language === "Hindi"
+        ? "हालैंड फिर चमके!"
+        : "ஹாலண்ட் மீண்டும் அசத்தினார்!";
   return (
-    <div className="preferences-grid">
-      <Panel title="YOUR SETTINGS" className="preference-panel">
-        <label>
-          LANGUAGE
-          <select value={language} onChange={(e) => setLanguage(e.target.value as typeof language)}>
-            <option>English</option>
-            <option>Hindi</option>
-            <option>Tamil</option>
-          </select>
-        </label>
+    <div className="preferences-grid scene-console">
+      <Panel title="LANGUAGE · YOUR PREFERENCES" className="preference-panel">
+        <div className="language-cards">
+          {(["English", "Hindi", "Tamil"] as const).map((item) => (
+            <button
+              key={item}
+              className={language === item ? "selected" : ""}
+              onClick={() => setLanguage(item)}
+            >
+              <Globe2 />
+              <b>{item}</b>
+              <small>{item === "English" ? "Full experience" : "Translated preview"}</small>
+            </button>
+          ))}
+        </div>
         <label>
           FAVOURITE CLUB
           <select value={club} onChange={(e) => setClub(e.target.value)}>
@@ -816,14 +1035,27 @@ function PreferencesScene({
           </select>
         </label>
         <label>
-          FOCUS MODE
-          <select value={focus} onChange={(e) => setFocus(e.target.value)}>
-            <option>Match story</option>
-            <option>Favourite player</option>
-            <option>Attacking play</option>
-            <option>Tactical insights</option>
+          FAVOURITE PLAYER
+          <select value={player} onChange={(e) => setPlayer(e.target.value)}>
+            <option>Erling Haaland #9</option>
+            <option>Kevin De Bruyne #17</option>
+            <option>Phil Foden #47</option>
           </select>
         </label>
+        <div className="field-label">FOCUS MODE</div>
+        <div className="segmented">
+          {["Match story", "Favourite player", "Attacking play", "Tactical insights"].map(
+            (item) => (
+              <button
+                key={item}
+                className={focus === item ? "selected" : ""}
+                onClick={() => setFocus(item)}
+              >
+                {item}
+              </button>
+            ),
+          )}
+        </div>
         <div className="field-label">VIEWING MODE</div>
         <div className="segmented">
           {(["Fan", "Analyst", "Broadcast"] as Mode[]).map((item) => (
@@ -841,24 +1073,62 @@ function PreferencesScene({
           onClick={() =>
             window.localStorage.setItem(
               "pitchpulse-preferences",
-              JSON.stringify({ language, club, focus, mode }),
+              JSON.stringify({ language, club, player, focus, mode }),
             )
           }
         >
           SAVE PREFERENCES
         </button>
       </Panel>
-      <Panel title="YOUR EXPERIENCE" className="experience">
-        <div className="experience-mark">{club === "Manchester City" ? "MCI" : "LIV"}</div>
-        <p className="eyebrow">
-          {language} · {mode.toUpperCase()} MODE
-        </p>
-        <h2>{club} through your lens.</h2>
-        <p className="body-copy">
-          Prioritising {focus.toLowerCase()} and the moments that matter most to you.
-        </p>
-        <span className="tag">#9 HAALAND · PRIORITY PLAYER</span>
-      </Panel>
+      <div className="preference-workspace">
+        <Panel
+          title={`YOUR PERSONALISED EXPERIENCE · ${mode.toUpperCase()} MODE`}
+          className="experience experience-main"
+        >
+          <div className="experience-story">
+            <div className="player-portrait">
+              <span>09</span>
+              <b>
+                ERLING
+                <br />
+                HAALAND
+              </b>
+            </div>
+            <div>
+              <p className="eyebrow">
+                {language} · {club} · {focus}
+              </p>
+              <h2>{languagePreview}</h2>
+              <p className="body-copy">{story}</p>
+              <span className="tag">PLAYER IMPACT · 2 GOALS · 4 SHOTS</span>
+            </div>
+          </div>
+        </Panel>
+        <Panel title="WHY IT MATTERS" className="why-panel">
+          <p className="body-copy">
+            Haaland&apos;s movement dragged Liverpool&apos;s centre-backs out of position, creating
+            space for Foden&apos;s chance just minutes later.
+          </p>
+          <MiniPitch heat />
+        </Panel>
+        <Panel title="MORE STORIES FOR YOU" className="recommendations">
+          {events
+            .filter((e) => e.type === "Goal" || e.type === "Pressure")
+            .map((e) => (
+              <button key={e.id} onClick={() => setLanguage(language)}>
+                <span>{e.minute}&apos;</span>
+                <b>
+                  {e.player} · {e.type}
+                </b>
+                <small>{e.detail}</small>
+              </button>
+            ))}
+        </Panel>
+        <Panel title="LANGUAGE PREVIEW" className="translation-preview">
+          <p>{story}</p>
+          <span>{formatClock(43)} · MCI 2 — 0 LIV</span>
+        </Panel>
+      </div>
     </div>
   );
 }
@@ -870,10 +1140,33 @@ function RecapStudio({
   notify: (v: string) => void;
 }) {
   const [style, setStyle] = useState("Short fan recap");
+  const stories: Record<string, { headline: string; body: string }> = {
+    "Short fan recap": {
+      headline: "City close it out with another Haaland masterclass.",
+      body: "Manchester City&apos;s clinical finishing and high pressing proved too much for Liverpool, with Haaland bagging a brace in the first half.",
+    },
+    "Analyst brief": {
+      headline: "High recoveries made the difference in the final third.",
+      body: "City compressed the pitch, recovered possession quickly and converted pressure into two high-value finishing sequences.",
+    },
+    "Broadcast script": {
+      headline: "CITY DOUBLE THEIR ADVANTAGE — HAALAND WITH THE FINISH.",
+      body: "Two goals. One commanding performance. Manchester City turn pressure into a statement win.",
+    },
+  };
+  const story = stories[style]!;
+  const copyRecap = async () => {
+    try {
+      await navigator.clipboard.writeText(`${story.headline}\n\n${story.body}`);
+      notify("RECAP COPIED TO CLIPBOARD");
+    } catch {
+      notify("COPY BLOCKED · USE EXPORT");
+    }
+  };
   return (
-    <div className="recap-studio-grid">
-      <Panel title="OUTPUT STYLE" className="mode-panel">
-        {["Short fan recap", "Analyst brief", "Broadcast script"].map((item) => (
+    <div className="recap-studio-grid scene-console">
+      <Panel title="STORY & OVERLAY OUTPUT" className="mode-panel">
+        {Object.keys(stories).map((item) => (
           <button
             className={`mode-button ${style === item ? "selected" : ""}`}
             key={item}
@@ -883,14 +1176,16 @@ function RecapStudio({
             {item}
           </button>
         ))}
+        <div className="score-mini">
+          <b>MCI 2 — 0 LIV</b>
+          <small>FULL TIME · 90:00</small>
+          <span>62% possession · 10 shots · 8 on target</span>
+        </div>
       </Panel>
-      <Panel title="STORY PREVIEW" className="story-preview">
-        <p className="eyebrow">PITCHPULSE · FULL-TIME STORY</p>
-        <h2>City&apos;s press writes the headline.</h2>
-        <p className="body-copy">
-          Manchester City secured a 2–0 victory over Liverpool in a dominant display. Two Haaland
-          finishes, backed by high recoveries and quick transitions, defined the match.
-        </p>
+      <Panel title="STORY PREVIEW · GENERATED FROM MATCH EVIDENCE" className="story-preview">
+        <p className="eyebrow">PITCHPULSE · FULL-TIME STORY · {style.toUpperCase()}</p>
+        <h2>{story.headline}</h2>
+        <p className="body-copy">{story.body}</p>
         <div className="story-sections">
           <span>01 · MATCH OVERVIEW</span>
           <span>02 · DEFINING MOMENTS</span>
@@ -898,18 +1193,44 @@ function RecapStudio({
           <span>04 · PERSONALISED TAKEAWAY</span>
         </div>
         <div className="button-row">
-          <button
-            onClick={() => {
-              navigator.clipboard?.writeText(buildRecapJson());
-              notify("RECAP COPIED TO CLIPBOARD");
-            }}
-          >
-            COPY RECAP
-          </button>
+          <button onClick={copyRecap}>COPY RECAP</button>
           <button onClick={() => download("pitchpulse-recap.json", buildRecapJson())}>
-            <Download /> EXPORT PACKAGE
+            <Download /> COPY JSON
+          </button>
+          <button onClick={() => download("pitchpulse-recap-package.json", buildRecapJson())}>
+            <Download /> DOWNLOAD PACKAGE
           </button>
         </div>
+      </Panel>
+      <Panel title="KEY MOMENTS" className="studio-moments">
+        {events
+          .filter((e) => e.type === "Goal" || e.type === "Tackle" || e.type === "Shot")
+          .map((event) => (
+            <div className="timeline-row" key={event.id}>
+              <b>{event.minute}&apos;</b>
+              <span className="dot lime-bg" />
+              <div>
+                <strong>
+                  {event.type} · {event.player}
+                </strong>
+                <small>{event.detail}</small>
+              </div>
+            </div>
+          ))}
+      </Panel>
+      <Panel title="TACTICAL BREAKDOWN" className="studio-tactics">
+        <MiniPitch heat />
+        <p className="body-copy">High press forced errors in the final third.</p>
+      </Panel>
+      <Panel title="PLAYER IMPACT" className="studio-player">
+        <div className="big-number lime">9.2</div>
+        <b>ERLING HAALAND</b>
+        <small>2 GOALS · 4 SHOTS · 87% PASS ACCURACY</small>
+      </Panel>
+      <Panel title="PERSONALISED TAKEAWAY">
+        <p className="body-copy">
+          City&apos;s pressing and quick transitions were the difference today.
+        </p>
       </Panel>
     </div>
   );

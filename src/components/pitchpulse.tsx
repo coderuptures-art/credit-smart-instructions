@@ -451,6 +451,20 @@ function LiveScene({
             High press success is creating fast transitions. <b>{stats.recoveries} recoveries</b>{" "}
             recorded in the attacking half.
           </p>
+          <div className="evidence-line">
+            <span>EV-021 · EV-052</span>
+            <b>VERIFIED SYNTHETIC DATA</b>
+          </div>
+        </Panel>
+        <Panel title="PLAYER FOCUS · TRACKING LOCK">
+          <div className="focus-player">
+            <span className="player-number">09</span>
+            <div>
+              <b>ERLING HAALAND</b>
+              <small>2 GOALS · 4 SHOTS · 8.7 RATING</small>
+            </div>
+            <ChevronRight />
+          </div>
         </Panel>
       </div>
     </div>
@@ -812,52 +826,167 @@ function ExplorerScene({
   setClock: (v: number) => void;
 }) {
   const [filter, setFilter] = useState<EventType | "All">("All");
-  const filtered = events.filter((event) => filter === "All" || event.type === filter);
+  const [team, setTeam] = useState("All teams");
+  const filtered = events.filter(
+    (event) =>
+      (filter === "All" || event.type === filter) && (team === "All teams" || event.team === team),
+  );
+  const select = (event: (typeof events)[number]) => {
+    setSelectedEvent(event);
+    setClock(event.minute);
+  };
   return (
-    <div className="explorer-grid">
-      <Panel title="EVENT FILTERS" className="filter-panel">
-        <select value={filter} onChange={(e) => setFilter(e.target.value as EventType | "All")}>
-          <option>All</option>
-          {["Goal", "Shot", "Pass", "Tackle", "Recovery", "Pressure", "Corner"].map((type) => (
-            <option key={type}>{type}</option>
-          ))}
-        </select>
+    <div className="explorer-grid scene-console">
+      <Panel title="FILTERS · EVENT INDEX" className="filter-panel">
+        <label>
+          TEAM
+          <select value={team} onChange={(e) => setTeam(e.target.value)}>
+            <option>All teams</option>
+            <option>MCI</option>
+            <option>LIV</option>
+          </select>
+        </label>
+        <label>
+          EVENT TYPE
+          <select value={filter} onChange={(e) => setFilter(e.target.value as EventType | "All")}>
+            <option>All</option>
+            {["Goal", "Shot", "Pass", "Tackle", "Recovery", "Pressure", "Corner"].map((type) => (
+              <option key={type}>{type}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          PLAYER
+          <select>
+            <option>All players</option>
+            <option>Erling Haaland</option>
+            <option>Rodri</option>
+            <option>Kevin De Bruyne</option>
+          </select>
+        </label>
+        <label>
+          MINUTE RANGE
+          <input type="range" min="0" max="90" defaultValue="67" />
+        </label>
+        <div className="button-row">
+          <button
+            className="primary-action"
+            onClick={() => {
+              setFilter("All");
+              setTeam("All teams");
+            }}
+          >
+            APPLY FILTERS
+          </button>
+          <button
+            onClick={() => {
+              setFilter("All");
+              setTeam("All teams");
+            }}
+          >
+            RESET
+          </button>
+        </div>
         <p className="pixel">{filtered.length} EVENTS INDEXED</p>
         <MiniPitch selected={selectedEvent.minute} />
-      </Panel>
-      <Panel title="EVENT LOG · SELECT ROW TO REPLAY" className="table-panel">
-        <div className="event-table" role="region" aria-label="Synthetic event log" tabIndex={0}>
-          <table>
-            <caption className="sr-only">Synthetic match event log</caption>
-            <thead>
-              <tr>
-                <th>TIME</th>
-                <th>TYPE</th>
-                <th>PLAYER</th>
-                <th>DETAIL</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((event) => (
-                <tr
-                  key={event.id}
-                  className={selectedEvent.id === event.id ? "selected" : ""}
-                  onClick={() => {
-                    setSelectedEvent(event);
-                    setClock(event.minute);
-                  }}
-                >
-                  <td>{event.minute}&apos;</td>
-                  <td>{event.type}</td>
-                  <td>{event.player}</td>
-                  <td>{event.detail}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="event-counts">
+          {["Pass", "Shot", "Tackle", "Foul", "Recovery", "Goal"].map((type) => (
+            <span key={type}>
+              {type}
+              <b>{events.filter((e) => e.type === type).length}</b>
+            </span>
+          ))}
         </div>
-        <pre className="json-view">{JSON.stringify(selectedEvent, null, 2)}</pre>
       </Panel>
+      <div className="explorer-center">
+        <Panel title="EVENT POSITION · SELECTED MARKER">
+          <MiniPitch selected={selectedEvent.minute} />
+          <div className="pitch-legend">
+            <span>● MCI</span>
+            <span>● LIV</span>
+            <span>◎ SELECTED EVENT</span>
+          </div>
+        </Panel>
+        <Panel title={`EVENT DETAILS · ${selectedEvent.id}`} className="event-detail">
+          <div className="detail-frame">
+            <MiniPitch selected={selectedEvent.minute} />
+            <span className="detail-play">▶</span>
+          </div>
+          <div>
+            <p className="eyebrow">
+              {selectedEvent.type} · {formatClock(selectedEvent.minute)}
+            </p>
+            <h3>{selectedEvent.player}</h3>
+            <p className="body-copy">{selectedEvent.detail}</p>
+            <small>
+              {selectedEvent.team} · x {selectedEvent.x} · y {selectedEvent.y} · synthetic event
+            </small>
+          </div>
+        </Panel>
+        <Panel title="EVENT TIMELINE · REPLAY">
+          <input
+            className="timeline-input"
+            type="range"
+            min="0"
+            max="90"
+            value={selectedEvent.minute}
+            onChange={(e) => setClock(Number(e.target.value))}
+          />
+          <div className="timeline-markers">
+            {events.map((event) => (
+              <button
+                key={event.id}
+                style={{ left: `${event.minute}%` }}
+                onClick={() => select(event)}
+                title={`${event.minute}' ${event.type}`}
+              />
+            ))}
+          </div>
+          <div className="control-deck">
+            <button onClick={() => setClock(Math.max(0, selectedEvent.minute - 1))}>
+              <RotateCcw />
+            </button>
+            <button onClick={() => setClock(selectedEvent.minute + 1)}>
+              <Play />
+            </button>
+            <span className="pixel">{formatClock(selectedEvent.minute)} · 1× 2× 4×</span>
+          </div>
+        </Panel>
+      </div>
+      <div className="explorer-right">
+        <Panel title="EVENT LOG · SELECT ROW TO REPLAY">
+          <div className="event-table">
+            <table>
+              <caption className="sr-only">Synthetic event log</caption>
+              <thead>
+                <tr>
+                  <th>TIME</th>
+                  <th>TYPE</th>
+                  <th>PLAYER</th>
+                  <th>TEAM</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((event) => (
+                  <tr
+                    key={event.id}
+                    className={selectedEvent.id === event.id ? "selected" : ""}
+                    onClick={() => select(event)}
+                  >
+                    <td>{event.minute}&apos;</td>
+                    <td>{event.type}</td>
+                    <td>{event.player.replace("Erling ", "")}</td>
+                    <td>{event.team}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Panel>
+        <Panel title="EVENT PAYLOAD · JSON">
+          <pre className="json-view">{JSON.stringify(selectedEvent, null, 2)}</pre>
+        </Panel>
+      </div>
     </div>
   );
 }
@@ -873,18 +1002,31 @@ function PreferencesScene({
   setLanguage: (v: "English" | "Hindi" | "Tamil") => void;
 }) {
   const [club, setClub] = useState("Manchester City");
+  const [player, setPlayer] = useState("Erling Haaland #9");
   const [focus, setFocus] = useState("Match story");
+  const story = STORIES[mode][language];
+  const languagePreview =
+    language === "English"
+      ? "Haaland strikes again!"
+      : language === "Hindi"
+        ? "हालैंड फिर चमके!"
+        : "ஹாலண்ட் மீண்டும் அசத்தினார்!";
   return (
-    <div className="preferences-grid">
-      <Panel title="YOUR SETTINGS" className="preference-panel">
-        <label>
-          LANGUAGE
-          <select value={language} onChange={(e) => setLanguage(e.target.value as typeof language)}>
-            <option>English</option>
-            <option>Hindi</option>
-            <option>Tamil</option>
-          </select>
-        </label>
+    <div className="preferences-grid scene-console">
+      <Panel title="LANGUAGE · YOUR PREFERENCES" className="preference-panel">
+        <div className="language-cards">
+          {(["English", "Hindi", "Tamil"] as const).map((item) => (
+            <button
+              key={item}
+              className={language === item ? "selected" : ""}
+              onClick={() => setLanguage(item)}
+            >
+              <Globe2 />
+              <b>{item}</b>
+              <small>{item === "English" ? "Full experience" : "Translated preview"}</small>
+            </button>
+          ))}
+        </div>
         <label>
           FAVOURITE CLUB
           <select value={club} onChange={(e) => setClub(e.target.value)}>
@@ -893,14 +1035,27 @@ function PreferencesScene({
           </select>
         </label>
         <label>
-          FOCUS MODE
-          <select value={focus} onChange={(e) => setFocus(e.target.value)}>
-            <option>Match story</option>
-            <option>Favourite player</option>
-            <option>Attacking play</option>
-            <option>Tactical insights</option>
+          FAVOURITE PLAYER
+          <select value={player} onChange={(e) => setPlayer(e.target.value)}>
+            <option>Erling Haaland #9</option>
+            <option>Kevin De Bruyne #17</option>
+            <option>Phil Foden #47</option>
           </select>
         </label>
+        <div className="field-label">FOCUS MODE</div>
+        <div className="segmented">
+          {["Match story", "Favourite player", "Attacking play", "Tactical insights"].map(
+            (item) => (
+              <button
+                key={item}
+                className={focus === item ? "selected" : ""}
+                onClick={() => setFocus(item)}
+              >
+                {item}
+              </button>
+            ),
+          )}
+        </div>
         <div className="field-label">VIEWING MODE</div>
         <div className="segmented">
           {(["Fan", "Analyst", "Broadcast"] as Mode[]).map((item) => (
@@ -918,24 +1073,62 @@ function PreferencesScene({
           onClick={() =>
             window.localStorage.setItem(
               "pitchpulse-preferences",
-              JSON.stringify({ language, club, focus, mode }),
+              JSON.stringify({ language, club, player, focus, mode }),
             )
           }
         >
           SAVE PREFERENCES
         </button>
       </Panel>
-      <Panel title="YOUR EXPERIENCE" className="experience">
-        <div className="experience-mark">{club === "Manchester City" ? "MCI" : "LIV"}</div>
-        <p className="eyebrow">
-          {language} · {mode.toUpperCase()} MODE
-        </p>
-        <h2>{club} through your lens.</h2>
-        <p className="body-copy">
-          Prioritising {focus.toLowerCase()} and the moments that matter most to you.
-        </p>
-        <span className="tag">#9 HAALAND · PRIORITY PLAYER</span>
-      </Panel>
+      <div className="preference-workspace">
+        <Panel
+          title={`YOUR PERSONALISED EXPERIENCE · ${mode.toUpperCase()} MODE`}
+          className="experience experience-main"
+        >
+          <div className="experience-story">
+            <div className="player-portrait">
+              <span>09</span>
+              <b>
+                ERLING
+                <br />
+                HAALAND
+              </b>
+            </div>
+            <div>
+              <p className="eyebrow">
+                {language} · {club} · {focus}
+              </p>
+              <h2>{languagePreview}</h2>
+              <p className="body-copy">{story}</p>
+              <span className="tag">PLAYER IMPACT · 2 GOALS · 4 SHOTS</span>
+            </div>
+          </div>
+        </Panel>
+        <Panel title="WHY IT MATTERS" className="why-panel">
+          <p className="body-copy">
+            Haaland&apos;s movement dragged Liverpool&apos;s centre-backs out of position, creating
+            space for Foden&apos;s chance just minutes later.
+          </p>
+          <MiniPitch heat />
+        </Panel>
+        <Panel title="MORE STORIES FOR YOU" className="recommendations">
+          {events
+            .filter((e) => e.type === "Goal" || e.type === "Pressure")
+            .map((e) => (
+              <button key={e.id} onClick={() => setLanguage(language)}>
+                <span>{e.minute}&apos;</span>
+                <b>
+                  {e.player} · {e.type}
+                </b>
+                <small>{e.detail}</small>
+              </button>
+            ))}
+        </Panel>
+        <Panel title="LANGUAGE PREVIEW" className="translation-preview">
+          <p>{story}</p>
+          <span>{formatClock(43)} · MCI 2 — 0 LIV</span>
+        </Panel>
+      </div>
     </div>
   );
 }
@@ -947,10 +1140,33 @@ function RecapStudio({
   notify: (v: string) => void;
 }) {
   const [style, setStyle] = useState("Short fan recap");
+  const stories: Record<string, { headline: string; body: string }> = {
+    "Short fan recap": {
+      headline: "City close it out with another Haaland masterclass.",
+      body: "Manchester City&apos;s clinical finishing and high pressing proved too much for Liverpool, with Haaland bagging a brace in the first half.",
+    },
+    "Analyst brief": {
+      headline: "High recoveries made the difference in the final third.",
+      body: "City compressed the pitch, recovered possession quickly and converted pressure into two high-value finishing sequences.",
+    },
+    "Broadcast script": {
+      headline: "CITY DOUBLE THEIR ADVANTAGE — HAALAND WITH THE FINISH.",
+      body: "Two goals. One commanding performance. Manchester City turn pressure into a statement win.",
+    },
+  };
+  const story = stories[style]!;
+  const copyRecap = async () => {
+    try {
+      await navigator.clipboard.writeText(`${story.headline}\n\n${story.body}`);
+      notify("RECAP COPIED TO CLIPBOARD");
+    } catch {
+      notify("COPY BLOCKED · USE EXPORT");
+    }
+  };
   return (
-    <div className="recap-studio-grid">
-      <Panel title="OUTPUT STYLE" className="mode-panel">
-        {["Short fan recap", "Analyst brief", "Broadcast script"].map((item) => (
+    <div className="recap-studio-grid scene-console">
+      <Panel title="STORY & OVERLAY OUTPUT" className="mode-panel">
+        {Object.keys(stories).map((item) => (
           <button
             className={`mode-button ${style === item ? "selected" : ""}`}
             key={item}
@@ -960,14 +1176,16 @@ function RecapStudio({
             {item}
           </button>
         ))}
+        <div className="score-mini">
+          <b>MCI 2 — 0 LIV</b>
+          <small>FULL TIME · 90:00</small>
+          <span>62% possession · 10 shots · 8 on target</span>
+        </div>
       </Panel>
-      <Panel title="STORY PREVIEW" className="story-preview">
-        <p className="eyebrow">PITCHPULSE · FULL-TIME STORY</p>
-        <h2>City&apos;s press writes the headline.</h2>
-        <p className="body-copy">
-          Manchester City secured a 2–0 victory over Liverpool in a dominant display. Two Haaland
-          finishes, backed by high recoveries and quick transitions, defined the match.
-        </p>
+      <Panel title="STORY PREVIEW · GENERATED FROM MATCH EVIDENCE" className="story-preview">
+        <p className="eyebrow">PITCHPULSE · FULL-TIME STORY · {style.toUpperCase()}</p>
+        <h2>{story.headline}</h2>
+        <p className="body-copy">{story.body}</p>
         <div className="story-sections">
           <span>01 · MATCH OVERVIEW</span>
           <span>02 · DEFINING MOMENTS</span>
@@ -975,18 +1193,44 @@ function RecapStudio({
           <span>04 · PERSONALISED TAKEAWAY</span>
         </div>
         <div className="button-row">
-          <button
-            onClick={() => {
-              navigator.clipboard?.writeText(buildRecapJson());
-              notify("RECAP COPIED TO CLIPBOARD");
-            }}
-          >
-            COPY RECAP
-          </button>
+          <button onClick={copyRecap}>COPY RECAP</button>
           <button onClick={() => download("pitchpulse-recap.json", buildRecapJson())}>
-            <Download /> EXPORT PACKAGE
+            <Download /> COPY JSON
+          </button>
+          <button onClick={() => download("pitchpulse-recap-package.json", buildRecapJson())}>
+            <Download /> DOWNLOAD PACKAGE
           </button>
         </div>
+      </Panel>
+      <Panel title="KEY MOMENTS" className="studio-moments">
+        {events
+          .filter((e) => e.type === "Goal" || e.type === "Tackle" || e.type === "Shot")
+          .map((event) => (
+            <div className="timeline-row" key={event.id}>
+              <b>{event.minute}&apos;</b>
+              <span className="dot lime-bg" />
+              <div>
+                <strong>
+                  {event.type} · {event.player}
+                </strong>
+                <small>{event.detail}</small>
+              </div>
+            </div>
+          ))}
+      </Panel>
+      <Panel title="TACTICAL BREAKDOWN" className="studio-tactics">
+        <MiniPitch heat />
+        <p className="body-copy">High press forced errors in the final third.</p>
+      </Panel>
+      <Panel title="PLAYER IMPACT" className="studio-player">
+        <div className="big-number lime">9.2</div>
+        <b>ERLING HAALAND</b>
+        <small>2 GOALS · 4 SHOTS · 87% PASS ACCURACY</small>
+      </Panel>
+      <Panel title="PERSONALISED TAKEAWAY">
+        <p className="body-copy">
+          City&apos;s pressing and quick transitions were the difference today.
+        </p>
       </Panel>
     </div>
   );
